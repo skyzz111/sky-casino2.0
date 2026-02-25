@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Casino: Social Elite</title>
+    <style>
+        :root { 
+            --felt: #218c74; --rim: #2c3e50; --gold: #f1c40f; --accent: #3498db; 
+            --rare: #55efc4; --super-rare: #81ecec; --legendary: #fab1a0; --mythic: #a29bfe; --exotic: #ff7675;
+        }
+        body { background: #f1f2f6; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; color: #2f3542; user-select: none; }
+
+        /* AUTH SCREEN */
+        #auth-overlay { position: fixed; inset: 0; background: #2c3e50; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .auth-box { background: white; padding: 40px; border-radius: 30px; width: 350px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .auth-input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-size: 1rem; }
+        .auth-btn { width: 100%; padding: 15px; background: var(--felt); color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        #menu-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.96); display: none; align-items: center; justify-content: center; z-index: 5000; backdrop-filter: blur(15px); }
+        .menu-panel { text-align: center; width: 750px; background: white; padding: 30px; border-radius: 40px; display: none; border: 1px solid #eee; }
+        
+        #game-container { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #table { width: 1100px; height: 550px; background: var(--felt); border: 18px solid var(--rim); border-radius: 500px 500px 180px 180px; transform: rotateX(8deg); position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.3); }
+
+        .slot { position: absolute; text-align: center; width: 130px; font-weight: bold; color: white; transition: 0.4s; padding: 15px; border-radius: 20px; }
+        .active-turn { background: rgba(255,255,255,0.2); box-shadow: 0 0 25px white; }
+        
+        .bottom-ui { margin-top: 40px; display: flex; align-items: center; gap: 30px; z-index: 100; }
+        .chip-container { display: flex; gap: 8px; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 100px; }
+        
+        .chip { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; cursor: pointer; border: 3px dashed rgba(255,255,255,0.5); box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: 0.2s; font-size: 0.75rem; }
+        .c-1 { background: #ecf0f1; color: #2c3e50; border-color: #bdc3c7; }
+        .c-5 { background: #e74c3c; }
+        .c-10 { background: #3498db; }
+        .c-50 { background: #e67e22; }
+        .c-100 { background: #2c3e50; }
+        .c-1k { background: #f1c40f; color: #7f8c8d; border-color: #f39c12; }
+        .c-10k { background: #ff00bf; }
+        .c-100k { background: #11ca00; }
+        .c-500k { background: #3a03ff; }
+        .all-in { background: #d63031 !important; width: 100px; border-radius: 50px; border-style: solid; }
+
+        .btn-pill { padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-hit { background: #ff4757; color: white; }
+        .btn-stand { background: #2e86de; color: white; }
+
+        #shop-display, #inventory-display { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; max-height: 400px; overflow-y: auto; padding: 10px; }
+        .card-item { padding: 15px; border-radius: 25px; border: 2px solid #eee; background: white; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+        .item-desc { font-size: 0.7rem; color: #7f8c8d; margin: 5px 0; min-height: 35px; }
+        
+        .card { width: 35px; height: 50px; background: white; border-radius: 5px; color: #333; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #ccc; font-size: 0.9rem; }
+        #dealer-slot { top: 15px; left: 475px; }
+        #player-slot { bottom: 80px; left: 475px; color: var(--gold); }
+
+        #hud { position:fixed; bottom:0; width:100%; background:white; padding:15px; display:flex; justify-content:center; gap:30px; align-items:center; border-top: 1px solid #ddd; z-index: 1000; }
+        .placed-item { position: absolute; font-size: 3rem; cursor: grab; z-index: 10; filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.2)); }
+        #round-lb { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid var(--gold); padding: 30px; border-radius: 40px; display: none; z-index: 6000; width: 300px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div id="auth-overlay">
+    <div class="auth-box">
+        <h2 id="auth-title">SKY CASINO LOGIN</h2>
+        <p style="font-size: 0.8rem; color: #666;">Ja esi jauns, vienkārši izdomā vārdu un paroli!</p>
+        <input type="text" id="user-name" class="auth-input" placeholder="Lietotājvārds">
+        <input type="password" id="user-pass" class="auth-input" placeholder="Parole">
+        <button onclick="handleAuth()" class="auth-btn">PIESLĒGTIES / REĢISTRĒTIES</button>
+    </div>
+</div>
+
+<div id="menu-overlay">
+    <div id="p-main" class="menu-panel" style="display:block;">
+        <h1 style="letter-spacing: 5px;">SKY CASINO</h1>
+        <p id="welcome-user" style="font-weight: bold; color: var(--accent);"></p>
+        <button onclick="closeMenu()" style="width:100%; padding:20px; background:var(--felt); color:white; border-radius:50px; border:none; cursor:pointer; font-weight:bold;">SĀKT SPĒLI</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+            <button onclick="showPanel('p-shop')" style="padding:15px; background:#e67e22; color:white; border-radius:50px; border:none;">VIP VEIKALS</button>
+            <button onclick="showPanel('p-inv')" style="padding:15px; background:var(--accent); color:white; border-radius:50px; border:none;">INVENTĀRS</button>
+        </div>
+        <button onclick="showPanel('p-promo')" style="width:100%; padding:15px; background:#8e44ad; color:white; border-radius:50px; border:none; margin-top:10px;">PROMO KODI</button>
+        <button onclick="location.reload()" style="margin-top:20px; background:none; border:none; color:red; cursor:pointer;">ATSLĒGTIES (LOGOUT)</button>
+    </div>
+
+    <div id="p-shop" class="menu-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>Elite VIP Shop</h2>
+            <span id="shop-timer" style="color:#e67e22; font-weight:bold; background:#fff3e0; padding:5px 15px; border-radius:20px;">05:00</span>
+        </div>
+        <div id="shop-display"></div>
+        <button onclick="showPanel('p-main')" class="btn-pill" style="width:100%; background:#eee;">ATPAKAĻ</button>
+    </div>
+
+    <div id="p-inv" class="menu-panel">
+        <h2>INVENTĀRS</h2>
+        <div id="inventory-display"></div>
+        <button onclick="showPanel('p-main')" class="btn-pill" style="width:100%; background:#eee;">ATPAKAĻ</button>
+    </div>
+
+    <div id="p-promo" class="menu-panel">
+        <h2>Redeem Codes</h2>
+        <input type="text" id="promo-in" placeholder="KODS" class="auth-input" style="text-align:center;">
+        <button onclick="redeem()" class="btn-pill" style="width:100%; background:#27ae60; color:white;">AKTIVIZĒT</button>
+        <button onclick="showPanel('p-main')" style="margin-top:15px; border:none; background:none;">ATPAKAĻ</button>
+    </div>
+</div>
+
+<div id="round-lb">
+    <h2>REZULTĀTI</h2>
+    <div id="lb-list" style="margin-bottom:20px;"></div>
+    <button onclick="document.getElementById('round-lb').style.display='none'" class="btn-pill" style="width:100%; background:var(--rim); color:white;">TURPINĀT</button>
+</div>
+
+<div id="game-container">
+    <div id="table">
+        <div id="dealer-slot" class="slot">UĢIS<div id="d-hand" style="display:flex; justify-content:center; gap:4px;"></div></div>
+        <div id="npc1-slot" class="slot" style="top:120px; left:30px;">TONY<div id="nh1" style="display:flex; justify-content:center; gap:2px;"></div></div>
+        <div id="npc2-slot" class="slot" style="top:320px; left:70px;">RICK<div id="nh2" style="display:flex; justify-content:center; gap:2px;"></div></div>
+        <div id="player-slot" class="slot">TU<br><span id="p-bet-tag">$0</span><div id="p-hand" style="display:flex; justify-content:center; gap:4px;"></div></div>
+        <div id="npc3-slot" class="slot" style="top:120px; right:30px;">SARAH<div id="nh3" style="display:flex; justify-content:center; gap:2px;"></div></div>
+        <div id="npc4-slot" class="slot" style="top:320px; right:70px;">VINNY<div id="nh4" style="display:flex; justify-content:center; gap:2px;"></div></div>
+        <button id="deal-btn" onclick="deal()" style="position:absolute; bottom:20px; left:42%; padding:15px 50px; background:white; border-radius:50px; font-weight:900; border:none; cursor:pointer;">DEAL</button>
+    </div>
+
+    <div class="bottom-ui">
+        <div id="play-actions" style="display:none; gap:10px;">
+            <button onclick="pAction('hit')" class="btn-pill btn-hit">HIT</button>
+            <button onclick="pAction('stand')" class="btn-pill btn-stand">STAND</button>
+        </div>
+        <div class="chip-container">
+            <div class="chip c-1" onclick="bet(1)">1</div>
+            <div class="chip c-5" onclick="bet(5)">5</div>
+            <div class="chip c-10" onclick="bet(10)">10</div>
+            <div class="chip c-50" onclick="bet(50)">50</div>
+            <div class="chip c-100" onclick="bet(100)">100</div>
+            <div class="chip c-1k" onclick="bet(1000)">1K</div>
+            <div class="chip c-10k" onclick="bet(10000)">10K</div>
+            <div class="chip c-100k" onclick="bet(100000)">100K</div>
+            <div class="chip c-500k" onclick="bet(500000)">500K</div>
+            <div class="chip all-in" onclick="allIn()">ALL IN</div>
+        </div>
+    </div>
+</div>
+
+<div id="hud">
+    <button onclick="openMenu()" class="btn-pill" style="background:#fff; border:1px solid #ddd;">MENU</button>
+    <button onclick="claimDailyGift()" class="btn-pill" style="background:#27ae60; color:white;">🎁 GIFT</button>
+    <div style="font-weight:900; font-size:1.8rem;">CASH: $<span id="wall">0</span></div>
+</div>
+
+<script>
+    let currentUser = null;
+    let wall = 1000, inventory = [], usedCodes = [], lastClaim = "";
+    let shopItems = [], lastShopRefresh = 0;
+    let currentBet = 0, playing = false, turnIdx = 0;
+    let pHand = [], dHand = [], nHands = [[],[],[],[]];
+
+    const rarities = [
+        {name: "rare", p: 1000, items: [{e:"🍕", d:"Skaists dekors galdam."}, {e:"🍹", d:"Atsvaidzinošs dzēriens."}]},
+        {name: "super-rare", p: 5000, items: [{e:"📱", d:"Sūti ziņas Rickam."}, {e:"🎮", d:"Kavē laiku starp raundiem."}]},
+        {name: "legendary", p: 25000, items: [{e:"💎", d:"Visi redz, ka esi bagāts."}, {e:"🛥", d:"Grezna jahta tavam fonam."}]},
+        {name: "mythic", p: 100000, items: [{e:"👑", d:"Dīleris pret tevi ir laipnāks."}, {e:"🦖", d:"T-Rex sargā tavus čipus."}]},
+        {name: "cheat", p: 100000000, items: [
+            {e:"🔮", d:"Redz dīlera slēpto kārti."}, 
+            {e:"🃏", d:"20% iespēja saņemt 10-nieku."},
+            {e:"🎰", d:"Dubulto laimestu (3x Win)."}
+        ]},
+        {name: "exotic", p: 500000000, items: [
+            {e:"🛸", d:"Ik pēc 30s sūta naudas bonusus."},
+            {e:"👽", d:"Citplanētietis no 51. zonas."}
+        ]}
+    ];
+
+    function handleAuth() {
+        const name = document.getElementById('user-name').value.trim();
+        const pass = document.getElementById('user-pass').value.trim();
+        if(!name || !pass) return alert("Ievadi datus!");
+        let userData = JSON.parse(localStorage.getItem('sky_user_' + name));
+        if(userData) {
+            if(userData.pass === pass) loadProfile(name, userData);
+            else alert("Nepareiza parole!");
+        } else {
+            if(confirm("Izveidot jaunu profilu?")) {
+                let newData = { pass, wall: 1000, inventory: [], usedCodes: [], lastClaim: "" };
+                localStorage.setItem('sky_user_' + name, JSON.stringify(newData));
+                loadProfile(name, newData);
+            }
+        }
+    }
+
+    function loadProfile(name, data) {
+        currentUser = name;
+        wall = data.wall; inventory = data.inventory; usedCodes = data.usedCodes; lastClaim = data.lastClaim;
+        document.getElementById('auth-overlay').style.display = 'none';
+        document.getElementById('game-container').style.display = 'flex';
+        document.getElementById('welcome-user').innerText = "SPĒLĒTĀJS: " + name.toUpperCase();
+        updateUI(); renderTable();
+        if(shopItems.length === 0) refreshShop();
+    }
+
+    function autosave() {
+        if(!currentUser) return;
+        let data = { pass: JSON.parse(localStorage.getItem('sky_user_' + currentUser)).pass, wall, inventory, usedCodes, lastClaim };
+        localStorage.setItem('sky_user_' + currentUser, JSON.stringify(data));
+    }
+
+    function refreshShop() {
+        shopItems = []; lastShopRefresh = Date.now();
+        for(let i=0; i<8; i++) {
+            let r = rarities[Math.floor(Math.random()*rarities.length)];
+            let itemData = r.items[Math.floor(Math.random()*r.items.length)];
+            shopItems.push({e: itemData.e, d: itemData.d, rarity: r.name, p: r.p});
+        }
+    }
+
+    setInterval(() => {
+        if(!currentUser) return;
+        let diff = Date.now() - lastShopRefresh;
+        if(diff > 300000) refreshShop();
+        let left = Math.ceil((300000 - diff) / 1000);
+        if(document.getElementById('shop-timer')) document.getElementById('shop-timer').innerText = `${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`;
+        
+        if(inventory.some(i => i.e === "🛸" && i.equipped) && Math.random() < 0.05) {
+            wall += Math.floor(Math.random()*15000); updateUI(); autosave();
+        }
+    }, 1000);
+
+    function buy(idx) {
+        let item = shopItems[idx];
+        if(wall >= item.p) {
+            wall -= item.p;
+            inventory.push({e: item.e, rarity: item.rarity, d: item.d, equipped: false, x: 450, y: 250});
+            updateUI(); autosave();
+        } else alert("Tev nepietiek naudas!");
+    }
+
+    function sellItem(idx) {
+        let item = inventory[idx];
+        let price = (item.e === "🛸") ? 500000000 : Math.floor(rarities.find(r => r.name === item.rarity).p * 0.7);
+        if(confirm(`Pārdot ${item.e} par $${price.toLocaleString()}?`)) {
+            wall += price; inventory.splice(idx, 1);
+            autosave(); updateUI(); renderInventory(); renderTable();
+        }
+    }
+
+    function renderShop() {
+        document.getElementById('shop-display').innerHTML = shopItems.map((item, idx) => `
+            <div class="card-item" style="border-top: 5px solid var(--${item.rarity})">
+                <span style="font-size:2.5rem">${item.e}</span>
+                <div class="item-desc">${item.d}</div>
+                <button onclick="buy(${idx})" class="btn-pill" style="background:var(--rim); color:white; width:100%;">$${item.p.toLocaleString()}</button>
+            </div>`).join('');
+    }
+
+    function renderInventory() {
+        document.getElementById('inventory-display').innerHTML = inventory.map((item, idx) => `
+            <div class="card-item">
+                <span style="font-size:2.5rem">${item.e}</span>
+                <div style="display:flex; gap:5px; width:100%; margin-top:10px;">
+                    <button onclick="toggleEquip(${idx})" class="btn-pill" style="background:${item.equipped?'#7f8c8d':'var(--accent)'}; color:white; flex:1; font-size:0.6rem;">${item.equipped?'OFF':'ON'}</button>
+                    <button onclick="sellItem(${idx})" class="btn-pill" style="background:#d63031; color:white; flex:1; font-size:0.6rem;">SELL</button>
+                </div>
+            </div>`).join('');
+    }
+
+    function toggleEquip(idx) { inventory[idx].equipped = !inventory[idx].equipped; renderInventory(); renderTable(); autosave(); }
+    
+    function renderTable() {
+        document.querySelectorAll('.placed-item').forEach(i => i.remove());
+        inventory.filter(i => i.equipped).forEach((item) => {
+            const d = document.createElement('div');
+            d.className = 'placed-item'; d.innerText = item.e;
+            d.style.left = item.x+"px"; d.style.top = item.y+"px";
+            d.onmousedown = (e) => {
+                let sX = e.clientX - d.offsetLeft, sY = e.clientY - d.offsetTop;
+                document.onmousemove = (me) => { item.x = me.clientX - sX; item.y = me.clientY - sY; d.style.left = item.x+"px"; d.style.top = item.y+"px"; };
+                document.onmouseup = () => { document.onmousemove = null; autosave(); };
+            };
+            document.getElementById('table').appendChild(d);
+        });
+    }
+
+    function draw() { 
+        if(inventory.some(i => i.e === "🃏" && i.equipped) && Math.random() < 0.2) return 10;
+        return Math.floor(Math.random()*9)+2; 
+    }
+    function getScore(h) { return h.reduce((a,b)=>a+b, 0); }
+
+    function bet(v) { if(!playing && wall >= v) { wall -= v; currentBet += v; updateUI(); } }
+    function allIn() { if(!playing && wall > 0) { currentBet += wall; wall = 0; updateUI(); } }
+
+    function deal() {
+        if(currentBet <= 0) return;
+        playing = true; pHand = [draw(), draw()]; dHand = [draw(), draw()];
+        for(let i=0; i<4; i++) nHands[i] = [draw(), draw()];
+        document.getElementById('deal-btn').style.display = 'none';
+        document.getElementById('play-actions').style.display = 'flex';
+        turnIdx = 0; nextTurn();
+    }
+
+    async function nextTurn() {
+        updateUI();
+        const slots = ["npc1-slot", "npc2-slot", "player-slot", "npc3-slot", "npc4-slot"];
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('active-turn'));
+        if(turnIdx >= slots.length) { dealerLogic(); return; }
+        document.getElementById(slots[turnIdx]).classList.add('active-turn');
+        if(turnIdx !== 2) { 
+            await new Promise(r => setTimeout(r, 800));
+            let nIdx = turnIdx < 2 ? turnIdx : turnIdx - 1;
+            if(getScore(nHands[nIdx]) < 17) nHands[nIdx].push(draw());
+            turnIdx++; nextTurn();
+        }
+    }
+
+    function pAction(type) {
+        if(type === 'hit') { pHand.push(draw()); updateUI(); if(getScore(pHand) > 21) pAction('stand'); }
+        else { document.getElementById('play-actions').style.display = 'none'; turnIdx++; nextTurn(); }
+    }
+
+    async function dealerLogic() {
+        playing = false;
+        while(getScore(dHand) < 17) { dHand.push(draw()); updateUI(); await new Promise(r => setTimeout(r, 800)); }
+        let ds = getScore(dHand);
+        let results = [];
+        const check = (name, hand) => {
+            let s = getScore(hand);
+            let status = (s <= 21 && (ds > 21 || s > ds)) ? "WIN" : (s === ds && s <= 21 ? "PUSH" : "LOSE");
+            return { name, status, color: status === "WIN" ? "#2ecc71" : (status === "PUSH" ? "#f1c40f" : "#e74c3c") };
+        };
+        results.push(check("TU", pHand));
+        results.push(check("TONY", nHands[0])); results.push(check("RICK", nHands[1]));
+        results.push(check("SARAH", nHands[2])); results.push(check("VINNY", nHands[3]));
+        
+        if(results[0].status === "WIN") {
+            let mult = inventory.some(i => i.e === "🎰" && i.equipped) ? 3 : 2;
+            wall += currentBet * mult;
+        } else if(results[0].status === "PUSH") wall += currentBet;
+
+        document.getElementById('lb-list').innerHTML = results.map(r => `<div style="display:flex; justify-content:space-between; margin:10px 0; font-weight:bold;"><span>${r.name}</span><span style="color:${r.color}">${r.status}</span></div>`).join('');
+        document.getElementById('round-lb').style.display = 'block';
+        currentBet = 0; pHand = []; dHand = []; nHands = [[],[],[],[]];
+        document.getElementById('deal-btn').style.display = 'block';
+        updateUI(); autosave();
+    }
+
+    function updateUI() {
+        document.getElementById('wall').innerText = wall.toLocaleString();
+        document.getElementById('p-bet-tag').innerText = `$${currentBet.toLocaleString()}`;
+        document.getElementById('p-hand').innerHTML = pHand.map(v => `<div class="card">${v}</div>`).join('');
+        let hasBall = inventory.some(i => i.e === "🔮" && i.equipped);
+        document.getElementById('d-hand').innerHTML = dHand.map((v, i) => (i==1 && playing && !hasBall) ? `<div class="card" style="background:#222;"></div>` : `<div class="card">${v}</div>`).join('');
+        for(let i=0; i<4; i++) document.getElementById(`nh${i+1}`).innerHTML = nHands[i].map(v => `<div class="card">${v}</div>`).join('');
+    }
+
+    function redeem() {
+    const val = document.getElementById('promo-in').value.toUpperCase().trim();
+    
+    // Standarta kodi
+    const codes = { 
+        LUCKY777: 7000, SKYHIGH: 15000, DRIP: 5000, BIGWINNER: 25000, 
+        CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000,
+        SKYCHAMP: 600000, KĀRLIS: 100000000, GALAXY: 1000000000
+    };
+
+    if (val === "RESET10") {
+        wall = 10; 
+        alert("Banka iztīrīta. Atlikuši $10.");
+    } else if (val === "BROKE") {
+        wall = 100;
+        alert("Nauda iestatīta uz $100.");
+    } else if (val === "TAXMAN") {
+        wall = Math.floor(wall * 0.2);
+        alert("Nodokļi paņēma 80%!");
+    } else if (codes[val] && !usedCodes.includes(val)) {
+        wall += codes[val];
+        usedCodes.push(val);
+        alert("Kods pieņemts!");
+    } else if (val === "FREEUFO" && !usedCodes.includes(val)) {
+        inventory.push({e:"🛸", rarity:"exotic", d:"UFO naudas stari.", equipped: false, x: 450, y: 250});
+        usedCodes.push(val);
+        alert("🛸 UFO PIEVIENOTS!");
+    } else {
+        alert("Kods nepareizs vai jau izmantots!");
+        return;
+    }
+
+    updateUI(); 
+    autosave(); 
+    document.getElementById('promo-in').value = "";
+}
+
+    function claimDailyGift() {
+        const today = new Date().toDateString();
+        if (lastClaim === today) return alert("Jau saņemts!");
+        let p = Math.floor(Math.random()*100000)+100;
+        wall += p; lastClaim = today; updateUI(); autosave();
+        alert(`Saņemti $${p.toLocaleString()}!`);
+    }
+
+    function showPanel(id) { 
+        document.querySelectorAll('.menu-panel').forEach(p => p.style.display='none'); 
+        document.getElementById(id).style.display='block'; 
+        if(id==='p-shop') renderShop();
+        if(id==='p-inv') renderInventory();
+    }
+    function openMenu() { document.getElementById('menu-overlay').style.display='flex'; }
+    function closeMenu() { document.getElementById('menu-overlay').style.display='none'; }
+</script>
+</body>
+</html>
