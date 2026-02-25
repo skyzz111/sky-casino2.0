@@ -53,9 +53,19 @@
         #dealer-slot { top: 15px; left: 475px; }
         #player-slot { bottom: 80px; left: 475px; color: var(--gold); }
 
-        #hud { position:fixed; bottom:0; width:100%; background:white; padding:15px; display:flex; justify-content:center; gap:30px; align-items:center; border-top: 1px solid #ddd; z-index: 1000; }
+        #hud { position:fixed; bottom:0; width:100%; background:white; padding:15px; display:flex; justify-content:center; gap:15px; align-items:center; border-top: 1px solid #ddd; z-index: 1000; }
         .placed-item { position: absolute; font-size: 3rem; cursor: grab; z-index: 10; filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.2)); }
         #round-lb { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid var(--gold); padding: 30px; border-radius: 40px; display: none; z-index: 6000; width: 300px; text-align: center; }
+
+        /* PHONE STYLES */
+        #phone-overlay { position: fixed; bottom: 100px; right: 20px; width: 280px; height: 400px; background: #121212; border-radius: 30px; border: 6px solid #333; display: none; flex-direction: column; z-index: 8000; overflow: hidden; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #phone-header { background: #222; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #333; }
+        #phone-chat { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-msg { padding: 8px 12px; border-radius: 15px; max-width: 80%; font-size: 0.85rem; }
+        .msg-me { background: var(--accent); align-self: flex-end; }
+        .msg-rick { background: #333; align-self: flex-start; color: var(--gold); }
+        #phone-input-box { display: flex; padding: 10px; background: #222; }
+        #phone-input { flex: 1; background: #333; border: none; padding: 8px; border-radius: 10px; color: white; }
     </style>
 </head>
 <body>
@@ -112,6 +122,17 @@
     <button onclick="document.getElementById('round-lb').style.display='none'" class="btn-pill" style="width:100%; background:var(--rim); color:white;">TURPINĀT</button>
 </div>
 
+<div id="phone-overlay">
+    <div id="phone-header">WHATSAPP: RICK</div>
+    <div id="phone-chat">
+        <div class="chat-msg msg-rick">Yo! Ko gribēji? Man nav laika, es mēģinu nozagt Uģa makšķeri.</div>
+    </div>
+    <div id="phone-input-box">
+        <input type="text" id="phone-input" placeholder="Raksti Rickam...">
+        <button onclick="sendPhoneMessage()" style="background:none; border:none; color:var(--accent); font-weight:bold; margin-left:5px;">SŪTĪT</button>
+    </div>
+</div>
+
 <div id="game-container">
     <div id="table">
         <div id="dealer-slot" class="slot">UĢIS<div id="d-hand" style="display:flex; justify-content:center; gap:4px;"></div></div>
@@ -145,6 +166,7 @@
 
 <div id="hud">
     <button onclick="openMenu()" class="btn-pill" style="background:#fff; border:1px solid #ddd;">MENU</button>
+    <button id="btn-phone" onclick="togglePhone()" class="btn-pill" style="display:none; background:#222; color:white;">📱 TELEFONS</button>
     <button onclick="claimDailyGift()" class="btn-pill" style="background:#27ae60; color:white;">🎁 GIFT</button>
     <div style="font-weight:900; font-size:1.8rem;">CASH: $<span id="wall">0</span></div>
 </div>
@@ -157,7 +179,7 @@
     let pHand = [], dHand = [], nHands = [[],[],[],[]];
 
     const rarities = [
-        {name: "rare", p: 1000, items: [{e:"🍕", d:"Skaists dekors galdam."}, {e:"🍹", d:"Atsvaidzinošs dzēriens."}]},
+        {name: "rare", p: 1000, items: [{e:"🍕", d:"Dod +$50 katru raundu."}, {e:"🍹", d:"Dod +$50 katru raundu."}]},
         {name: "super-rare", p: 5000, items: [{e:"📱", d:"Sūti ziņas Rickam."}, {e:"🎮", d:"Kavē laiku starp raundiem."}]},
         {name: "legendary", p: 25000, items: [{e:"💎", d:"Visi redz, ka esi bagāts."}, {e:"🛥", d:"Grezna jahta tavam fonam."}]},
         {name: "mythic", p: 100000, items: [{e:"👑", d:"Dīleris pret tevi ir laipnāks."}, {e:"🦖", d:"T-Rex sargā tavus čipus."}]},
@@ -201,7 +223,8 @@
 
     function autosave() {
         if(!currentUser) return;
-        let data = { pass: JSON.parse(localStorage.getItem('sky_user_' + currentUser)).pass, wall, inventory, usedCodes, lastClaim };
+        let storageData = JSON.parse(localStorage.getItem('sky_user_' + currentUser));
+        let data = { pass: storageData.pass, wall, inventory, usedCodes, lastClaim };
         localStorage.setItem('sky_user_' + currentUser, JSON.stringify(data));
     }
 
@@ -214,6 +237,7 @@
         }
     }
 
+    // Pasīvie efekti (UFO un citi)
     setInterval(() => {
         if(!currentUser) return;
         let diff = Date.now() - lastShopRefresh;
@@ -221,10 +245,42 @@
         let left = Math.ceil((300000 - diff) / 1000);
         if(document.getElementById('shop-timer')) document.getElementById('shop-timer').innerText = `${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`;
         
-        if(inventory.some(i => i.e === "🛸" && i.equipped) && Math.random() < 0.05) {
-            wall += Math.floor(Math.random()*15000); updateUI(); autosave();
+        if(inventory.some(i => i.e === "🛸" && i.equipped) && Math.random() < 0.1) {
+            let bonus = Math.floor(Math.random()*15000);
+            wall += bonus; updateUI(); autosave();
+            console.log("UFO atsūtīja $" + bonus);
         }
     }, 1000);
+
+    function togglePhone() {
+        let p = document.getElementById('phone-overlay');
+        p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function sendPhoneMessage() {
+        let input = document.getElementById('phone-input');
+        let chat = document.getElementById('phone-chat');
+        if(!input.value) return;
+
+        chat.innerHTML += `<div class="chat-msg msg-me">${input.value}</div>`;
+        let userText = input.value.toLowerCase();
+        input.value = "";
+
+        setTimeout(() => {
+            let responses = [
+                "Rick: Es tagad nevaru runāt, Uģis mani dzenā ar slotu.",
+                "Rick: Vai tu zināji, ka 2+2 ir Blackjack?",
+                "Rick: Vinny man ir parādā 5 eiro. Pasaki viņam.",
+                "Rick: Es tikko atradu UFO aiz stūra. Tas izskatās pēc tavas mammas pannas.",
+                "Rick: Blackjack ir spēle, kurā es vienmēr zaudēju, bet tu nē.",
+                "Rick: Uzliec visu uz All-In. Tici man (nē, netici).",
+                "Rick: Man garšo pica ar dīzeļdegvielu."
+            ];
+            let r = responses[Math.floor(Math.random()*responses.length)];
+            chat.innerHTML += `<div class="chat-msg msg-rick">${r}</div>`;
+            chat.scrollTop = chat.scrollHeight;
+        }, 1000);
+    }
 
     function buy(idx) {
         let item = shopItems[idx];
@@ -237,7 +293,7 @@
 
     function sellItem(idx) {
         let item = inventory[idx];
-        let price = (item.e === "🛸") ? 500000000 : Math.floor(rarities.find(r => r.name === item.rarity).p * 0.7);
+        let price = Math.floor(rarities.find(r => r.name === item.rarity).p * 0.7);
         if(confirm(`Pārdot ${item.e} par $${price.toLocaleString()}?`)) {
             wall += price; inventory.splice(idx, 1);
             autosave(); updateUI(); renderInventory(); renderTable();
@@ -264,7 +320,10 @@
             </div>`).join('');
     }
 
-    function toggleEquip(idx) { inventory[idx].equipped = !inventory[idx].equipped; renderInventory(); renderTable(); autosave(); }
+    function toggleEquip(idx) { 
+        inventory[idx].equipped = !inventory[idx].equipped; 
+        renderInventory(); renderTable(); updateUI(); autosave(); 
+    }
     
     function renderTable() {
         document.querySelectorAll('.placed-item').forEach(i => i.remove());
@@ -279,6 +338,9 @@
             };
             document.getElementById('table').appendChild(d);
         });
+        
+        // Parādīt/paslēpt telefonu HUDā
+        document.getElementById('btn-phone').style.display = inventory.some(i => i.e === "📱" && i.equipped) ? "block" : "none";
     }
 
     function draw() { 
@@ -320,7 +382,29 @@
 
     async function dealerLogic() {
         playing = false;
-        while(getScore(dHand) < 17) { dHand.push(draw()); updateUI(); await new Promise(r => setTimeout(r, 800)); }
+        
+        // 👑 Kronis: Dīleris kļūst pārgalvīgs
+        let hasCrown = inventory.some(i => i.e === "👑" && i.equipped);
+        
+        while(getScore(dHand) < 17) { 
+            dHand.push(draw()); 
+            
+            // 🦖 T-Rex: Ja dīlerim 20 vai 21, viņš nobīstas un pārmet
+            if((getScore(dHand) === 20 || getScore(dHand) === 21) && inventory.some(i => i.e === "🦖" && i.equipped)) {
+                console.log("T-Rex nobiedēja Uģi!");
+                dHand[dHand.length-1] = draw(); 
+            }
+            
+            updateUI(); 
+            await new Promise(r => setTimeout(r, 800)); 
+        }
+
+        // Kronis: 25% iespēja, ka dīleris riskē vēlreiz, ja viņš uzvarētu
+        if(hasCrown && getScore(dHand) >= 17 && getScore(dHand) <= 21 && getScore(dHand) > getScore(pHand) && Math.random() < 0.25) {
+             console.log("Uģis izdarīja kļūdu kroņa dēļ!");
+             dHand.push(draw()); updateUI();
+        }
+
         let ds = getScore(dHand);
         let results = [];
         const check = (name, hand) => {
@@ -335,6 +419,9 @@
         if(results[0].status === "WIN") {
             let mult = inventory.some(i => i.e === "🎰" && i.equipped) ? 3 : 2;
             wall += currentBet * mult;
+            // 🍕 & 🍹 Pasīvais bonuss
+            if(inventory.some(i => i.e === "🍕" && i.equipped)) wall += 50;
+            if(inventory.some(i => i.e === "🍹" && i.equipped)) wall += 50;
         } else if(results[0].status === "PUSH") wall += currentBet;
 
         document.getElementById('lb-list').innerHTML = results.map(r => `<div style="display:flex; justify-content:space-between; margin:10px 0; font-weight:bold;"><span>${r.name}</span><span style="color:${r.color}">${r.status}</span></div>`).join('');
@@ -354,41 +441,14 @@
     }
 
     function redeem() {
-    const val = document.getElementById('promo-in').value.toUpperCase().trim();
-    
-    // Standarta kodi
-    const codes = { 
-        LUCKY777: 7000, SKYHIGH: 15000, DRIP: 5000, BIGWINNER: 25000, 
-        CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000,
-        SKYCHAMP: 600000, KĀRLIS: 100000000, GALAXY: 1000000000
-    };
-
-    if (val === "RESET10") {
-        wall = 10; 
-        alert("Banka iztīrīta. Atlikuši $10.");
-    } else if (val === "BROKE") {
-        wall = 100;
-        alert("Nauda iestatīta uz $100.");
-    } else if (val === "TAXMAN") {
-        wall = Math.floor(wall * 0.2);
-        alert("Nodokļi paņēma 80%!");
-    } else if (codes[val] && !usedCodes.includes(val)) {
-        wall += codes[val];
-        usedCodes.push(val);
-        alert("Kods pieņemts!");
-    } else if (val === "FREEUFO" && !usedCodes.includes(val)) {
-        inventory.push({e:"🛸", rarity:"exotic", d:"UFO naudas stari.", equipped: false, x: 450, y: 250});
-        usedCodes.push(val);
-        alert("🛸 UFO PIEVIENOTS!");
-    } else {
-        alert("Kods nepareizs vai jau izmantots!");
-        return;
+        const val = document.getElementById('promo-in').value.toUpperCase().trim();
+        const codes = { LUCKY777: 7000, SKYHIGH: 15000, DRIP: 5000, BIGWINNER: 25000, CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000, SKYCHAMP: 600000, KĀRLIS: 100000000, GALAXY: 1000000000 };
+        if (val === "TAXMAN") { wall = Math.floor(wall * 0.2); alert("Nodokļi paņēma 80%!"); }
+        else if (codes[val] && !usedCodes.includes(val)) { wall += codes[val]; usedCodes.push(val); alert("Kods pieņemts!"); }
+        else if (val === "FREEUFO" && !usedCodes.includes(val)) { inventory.push({e:"🛸", rarity:"exotic", d:"UFO naudas stari.", equipped: false, x: 450, y: 250}); usedCodes.push(val); alert("🛸 UFO PIEVIENOTS!"); }
+        else { alert("Kods nepareizs!"); return; }
+        updateUI(); autosave(); document.getElementById('promo-in').value = "";
     }
-
-    updateUI(); 
-    autosave(); 
-    document.getElementById('promo-in').value = "";
-}
 
     function claimDailyGift() {
         const today = new Date().toDateString();
