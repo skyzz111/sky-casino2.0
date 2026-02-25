@@ -57,7 +57,6 @@
         .placed-item { position: absolute; font-size: 3rem; cursor: grab; z-index: 10; filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.2)); }
         #round-lb { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid var(--gold); padding: 30px; border-radius: 40px; display: none; z-index: 6000; width: 300px; text-align: center; }
 
-        /* PHONE STYLES */
         #phone-overlay { position: fixed; bottom: 100px; right: 20px; width: 280px; height: 400px; background: #121212; border-radius: 30px; border: 6px solid #333; display: none; flex-direction: column; z-index: 8000; overflow: hidden; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #phone-header { background: #222; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #333; }
         #phone-chat { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
@@ -195,29 +194,46 @@
     ];
 
     function handleAuth() {
-        const name = document.getElementById('user-name').value.trim();
-        const pass = document.getElementById('user-pass').value.trim();
-        if(!name || !pass) return alert("Ievadi datus!");
-        let userData = JSON.parse(localStorage.getItem('sky_user_' + name));
-        if(userData) {
-            if(userData.pass === pass) loadProfile(name, userData);
-            else alert("Nepareiza parole!");
-        } else {
-            if(confirm("Izveidot jaunu profilu?")) {
+        const nameInput = document.getElementById('user-name');
+        const passInput = document.getElementById('user-pass');
+        const name = nameInput.value.trim();
+        const pass = passInput.value.trim();
+
+        if(!name || !pass) return alert("Ievadi lietotājvārdu un paroli!");
+
+        try {
+            let userData = JSON.parse(localStorage.getItem('sky_user_' + name));
+            if(userData) {
+                if(userData.pass === pass) {
+                    loadProfile(name, userData);
+                } else {
+                    alert("Nepareiza parole!");
+                }
+            } else {
+                // Jauns profils
                 let newData = { pass, wall: 1000, inventory: [], usedCodes: [], lastClaim: "" };
                 localStorage.setItem('sky_user_' + name, JSON.stringify(newData));
                 loadProfile(name, newData);
+                alert("Profils izveidots!");
             }
+        } catch(e) {
+            alert("Kļūda saglabājot datus! Pārbaudi pārlūka iestatījumus.");
         }
     }
 
     function loadProfile(name, data) {
         currentUser = name;
-        wall = data.wall; inventory = data.inventory; usedCodes = data.usedCodes; lastClaim = data.lastClaim;
+        wall = data.wall; 
+        inventory = data.inventory || []; 
+        usedCodes = data.usedCodes || []; 
+        lastClaim = data.lastClaim || "";
+        
         document.getElementById('auth-overlay').style.display = 'none';
         document.getElementById('game-container').style.display = 'flex';
         document.getElementById('welcome-user').innerText = "SPĒLĒTĀJS: " + name.toUpperCase();
-        updateUI(); renderTable();
+        
+        updateUI(); 
+        renderTable();
         if(shopItems.length === 0) refreshShop();
     }
 
@@ -237,7 +253,6 @@
         }
     }
 
-    // Pasīvie efekti (UFO un citi)
     setInterval(() => {
         if(!currentUser) return;
         let diff = Date.now() - lastShopRefresh;
@@ -248,7 +263,6 @@
         if(inventory.some(i => i.e === "🛸" && i.equipped) && Math.random() < 0.1) {
             let bonus = Math.floor(Math.random()*15000);
             wall += bonus; updateUI(); autosave();
-            console.log("UFO atsūtīja $" + bonus);
         }
     }, 1000);
 
@@ -263,20 +277,17 @@
         if(!input.value) return;
 
         chat.innerHTML += `<div class="chat-msg msg-me">${input.value}</div>`;
-        let userText = input.value.toLowerCase();
         input.value = "";
 
         setTimeout(() => {
             let responses = [
-                "Rick: Es tagad nevaru runāt, Uģis mani dzenā ar slotu.",
-                "Rick: Vai tu zināji, ka 2+2 ir Blackjack?",
-                "Rick: Vinny man ir parādā 5 eiro. Pasaki viņam.",
-                "Rick: Es tikko atradu UFO aiz stūra. Tas izskatās pēc tavas mammas pannas.",
-                "Rick: Blackjack ir spēle, kurā es vienmēr zaudēju, bet tu nē.",
-                "Rick: Uzliec visu uz All-In. Tici man (nē, netici).",
-                "Rick: Man garšo pica ar dīzeļdegvielu."
-                 "Rick: es strādāju striptīz kluba negribi nopirkt stringus?"
-             "Rick: tu smirdi kārli."
+                "Rick: Uģis mani dzenā ar slotu.",
+                "Rick: 2+2 ir Blackjack!",
+                "Rick: Vinny man ir parādā 5 eiro.",
+                "Rick: Es atradu UFO aiz stūra.",
+                "Rick: All-In ir vienīgā izeja!",
+                "Rick: Man garšo pica ar dīzeļdegvielu.",
+                "Rick: Tu smirdi, Kārli."
             ];
             let r = responses[Math.floor(Math.random()*responses.length)];
             chat.innerHTML += `<div class="chat-msg msg-rick">${r}</div>`;
@@ -290,6 +301,7 @@
             wall -= item.p;
             inventory.push({e: item.e, rarity: item.rarity, d: item.d, equipped: false, x: 450, y: 250});
             updateUI(); autosave();
+            renderShop();
         } else alert("Tev nepietiek naudas!");
     }
 
@@ -329,7 +341,7 @@
     
     function renderTable() {
         document.querySelectorAll('.placed-item').forEach(i => i.remove());
-        inventory.filter(i => i.equipped).forEach((item) => {
+        inventory.filter(i => i && i.equipped).forEach((item) => {
             const d = document.createElement('div');
             d.className = 'placed-item'; d.innerText = item.e;
             d.style.left = item.x+"px"; d.style.top = item.y+"px";
@@ -340,8 +352,6 @@
             };
             document.getElementById('table').appendChild(d);
         });
-        
-        // Parādīt/paslēpt telefonu HUDā
         document.getElementById('btn-phone').style.display = inventory.some(i => i.e === "📱" && i.equipped) ? "block" : "none";
     }
 
@@ -355,7 +365,7 @@
     function allIn() { if(!playing && wall > 0) { currentBet += wall; wall = 0; updateUI(); } }
 
     function deal() {
-        if(currentBet <= 0) return;
+        if(currentBet <= 0) return alert("Uzliec likmi!");
         playing = true; pHand = [draw(), draw()]; dHand = [draw(), draw()];
         for(let i=0; i<4; i++) nHands[i] = [draw(), draw()];
         document.getElementById('deal-btn').style.display = 'none';
@@ -370,7 +380,7 @@
         if(turnIdx >= slots.length) { dealerLogic(); return; }
         document.getElementById(slots[turnIdx]).classList.add('active-turn');
         if(turnIdx !== 2) { 
-            await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 600));
             let nIdx = turnIdx < 2 ? turnIdx : turnIdx - 1;
             if(getScore(nHands[nIdx]) < 17) nHands[nIdx].push(draw());
             turnIdx++; nextTurn();
@@ -384,26 +394,15 @@
 
     async function dealerLogic() {
         playing = false;
-        
-        // 👑 Kronis: Dīleris kļūst pārgalvīgs
         let hasCrown = inventory.some(i => i.e === "👑" && i.equipped);
-        
         while(getScore(dHand) < 17) { 
             dHand.push(draw()); 
-            
-            // 🦖 T-Rex: Ja dīlerim 20 vai 21, viņš nobīstas un pārmet
             if((getScore(dHand) === 20 || getScore(dHand) === 21) && inventory.some(i => i.e === "🦖" && i.equipped)) {
-                console.log("T-Rex nobiedēja Uģi!");
                 dHand[dHand.length-1] = draw(); 
             }
-            
-            updateUI(); 
-            await new Promise(r => setTimeout(r, 800)); 
+            updateUI(); await new Promise(r => setTimeout(r, 600)); 
         }
-
-        // Kronis: 25% iespēja, ka dīleris riskē vēlreiz, ja viņš uzvarētu
         if(hasCrown && getScore(dHand) >= 17 && getScore(dHand) <= 21 && getScore(dHand) > getScore(pHand) && Math.random() < 0.25) {
-             console.log("Uģis izdarīja kļūdu kroņa dēļ!");
              dHand.push(draw()); updateUI();
         }
 
@@ -421,7 +420,6 @@
         if(results[0].status === "WIN") {
             let mult = inventory.some(i => i.e === "🎰" && i.equipped) ? 3 : 2;
             wall += currentBet * mult;
-            // 🍕 & 🍹 Pasīvais bonuss
             if(inventory.some(i => i.e === "🍕" && i.equipped)) wall += 50;
             if(inventory.some(i => i.e === "🍹" && i.equipped)) wall += 50;
         } else if(results[0].status === "PUSH") wall += currentBet;
@@ -448,7 +446,7 @@
         if (val === "TAXMAN") { wall = Math.floor(wall * 0.2); alert("Nodokļi paņēma 80%!"); }
         else if (codes[val] && !usedCodes.includes(val)) { wall += codes[val]; usedCodes.push(val); alert("Kods pieņemts!"); }
         else if (val === "FREEUFO" && !usedCodes.includes(val)) { inventory.push({e:"🛸", rarity:"exotic", d:"UFO naudas stari.", equipped: false, x: 450, y: 250}); usedCodes.push(val); alert("🛸 UFO PIEVIENOTS!"); }
-        else { alert("Kods nepareizs!"); return; }
+        else { alert("Kods nepareizs vai jau izmantots!"); return; }
         updateUI(); autosave(); document.getElementById('promo-in').value = "";
     }
 
@@ -471,4 +469,3 @@
 </script>
 </body>
 </html>
-
