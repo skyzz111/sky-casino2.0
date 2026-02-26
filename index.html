@@ -182,12 +182,12 @@
         {name: "super-rare", p: 5000, items: [{e:"📱", d:"Sūti ziņas Rickam."}, {e:"🎮", d:"Kavē laiku starp raundiem."}]},
         {name: "legendary", p: 25000, items: [{e:"💎", d:"Visi redz, ka esi bagāts."}, {e:"🛥", d:"Grezna jahta tavam fonam."}]},
         {name: "mythic", p: 100000, items: [{e:"👑", d:"Dīleris pret tevi ir laipnāks."}, {e:"🦖", d:"T-Rex sargā tavus čipus."}]},
-        {name: "cheat", p: 100000000, items: [
+        {name: "cheat", p: 1000000000, items: [
             {e:"🔮", d:"Redz dīlera slēpto kārti."}, 
             {e:"🃏", d:"20% iespēja saņemt 10-nieku."},
             {e:"🎰", d:"Dubulto laimestu (3x Win)."}
         ]},
-        {name: "exotic", p: 500000000, items: [
+        {name: "exotic", p: 1000000000, items: [
             {e:"🛸", d:"Ik pēc 30s sūta naudas bonusus."},
             {e:"👽", d:"Citplanētietis no 51. zonas."}
         ]}
@@ -451,7 +451,7 @@
 
     function redeem() {
         const val = document.getElementById('promo-in').value.toUpperCase().trim();
-        const codes = { LUCKY777: 7000, SKYHIGH: 15000, DRIP: 5000, BIGWINNER: 25000, CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000, SKYCHAMP: 600000, KĀRLIS: 100000000, GALAXY: 1000000000 };
+        const codes = { LUCKY777: 7000, SKYHIGH: 15000, KĀRLISSMIRD: 100000000 DRIP: 5000, BIGWINNER: 25000, CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000, SKYCHAMP: 600000, KĀRLIS: 100000000, GALAXY: 1000000000 };
         if (val === "TAXMAN") { wall = Math.floor(wall * 0.2); alert("Nodokļi paņēma 80%!"); }
         else if (codes[val] && !usedCodes.includes(val)) { wall += codes[val]; usedCodes.push(val); alert("Kods pieņemts!"); }
         else if (val === "FREEUFO" && !usedCodes.includes(val)) { inventory.push({e:"🛸", rarity:"exotic", d:"UFO naudas stari.", equipped: false, x: 450, y: 250}); usedCodes.push(val); alert("🛸 UFO PIEVIENOTS!"); }
@@ -478,5 +478,6 @@
 </script>
 </body>
 </html>
+
 
 
