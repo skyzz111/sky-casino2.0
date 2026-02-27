@@ -166,8 +166,9 @@
             <div class="chip c-1k" onclick="bet(1000)">1K</div>
             <div class="chip c-10k" onclick="bet(10000)">10K</div>
             <div class="chip c-100k" onclick="bet(100000)">100K</div>
-            <div class="chip c-500k" onclick="bet(500000)">500K</div
+            <div class="chip c-500k" onclick="bet(500000)">500K</div>
             <div class="chip all-in" onclick="allIn()">ALL IN</div>
+           
         </div>
     </div>
 </div>
@@ -201,11 +202,12 @@
             {e:"🌶️", d:"Hot Sauce: 5x laimests ar 20 vai 21."},
             {e:"🍀", d:"Lucky Clover: 30% nezaudēt vai 15% dubultot."}
         ]},
-        {name: "cheat", p: 10000000, items: [
-            {e:"🔮", d:"Redz dīlera slēpto kārti."}, 
-            {e:"🃏", d:"20% iespēja saņemt 10-nieku."},
-            {e:"🎰", d:"Dubulto laimestu (3x Win)."}
-            {e:"🕶️", d:"VIP Shades: Dīleris stāv pie 16."}
+        { name: "cheat", p: 10000000, items: [
+    {e:"🔮", d:"Redz dīlera slēpto kārti."}, 
+    {e:"🃏", d:"20% iespēja saņemt 10-nieku."},
+    {e:"🎰", d:"Dubulto laimestu (3x Win)."},
+    {e:"🕶️", d:"VIP Shades: Dīleris stāv pie 16."}
+   ]},
         ]},
         {name: "exotic", p: 25000000, items: [
             {e:"🛸", d:"Ik pēc 30s sūta naudas bonusus."},
@@ -214,22 +216,30 @@
     ];
 
     function handleAuth() {
-        const nameInput = document.getElementById('user-name');
-        const passInput = document.getElementById('user-pass');
-        const name = nameInput.value.trim();
-        const pass = passInput.value.trim();
-        if(!name || !pass) return alert("Ievadi lietotājvārdu un paroli!");
-        let userData = JSON.parse(localStorage.getItem('sky_user_' + name));
-        if(userData) {
-            if(userData.pass === pass) loadProfile(name, userData);
-            else alert("Nepareiza parole!");
-        } else {
-            let newData = { pass, wall: 1000, inventory: [], usedCodes: [], lastClaim: "" };
-            localStorage.setItem('sky_user_' + name, JSON.stringify(newData));
-            loadProfile(name, newData);
-            alert("Profils izveidots!");
-        }
+    const name = document.getElementById('user-name').value.trim();
+    const pass = document.getElementById('user-pass').value.trim();
+
+    if(!name || !pass) {
+        alert("Ievadi lietotājvārdu un paroli!");
+        return;
     }
+
+    let raw = localStorage.getItem('sky_user_' + name);
+    let userData = raw ? JSON.parse(raw) : null;
+
+    if(userData) {
+        if(userData.pass === pass) {
+            loadProfile(name, userData);
+        } else {
+            alert("Nepareiza parole!");
+        }
+    } else {
+        let newData = { pass, wall: 1000, inventory: [], usedCodes: [], lastClaim: "" };
+        localStorage.setItem('sky_user_' + name, JSON.stringify(newData));
+        loadProfile(name, newData);
+        alert("Profils izveidots!");
+    }
+}
 
     function loadProfile(name, data) {
         currentUser = name; wall = data.wall; inventory = data.inventory || []; usedCodes = data.usedCodes || []; lastClaim = data.lastClaim || "";
@@ -241,12 +251,23 @@
     }
 
     function autosave() {
-        if(!currentUser) return;
-        let storageData = JSON.parse(localStorage.getItem('sky_user_' + currentUser));
-        let data = { pass: storageData.pass, wall, inventory, usedCodes, lastClaim };
-        localStorage.setItem('sky_user_' + currentUser, JSON.stringify(data));
-    }
+    if(!currentUser) return;
 
+    let raw = localStorage.getItem('sky_user_' + currentUser);
+    if(!raw) return;
+
+    let storageData = JSON.parse(raw);
+
+    let data = {
+        pass: storageData.pass,
+        wall,
+        inventory,
+        usedCodes,
+        lastClaim
+    };
+
+    localStorage.setItem('sky_user_' + currentUser, JSON.stringify(data));
+}
     function refreshShop() {
         shopItems = []; lastShopRefresh = Date.now();
         for(let i=0; i<8; i++) {
@@ -468,5 +489,6 @@
 </script>
 </body>
 </html>
+
 
 
