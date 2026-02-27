@@ -316,7 +316,15 @@
     function deal() {
         if(currentBet <= 0) return alert("Uzliec likmi!");
         playing = true; document.getElementById('cancel-btn').style.display = 'none';
-        pHand = [draw(), draw()]; dHand = [draw(), draw()];
+        
+        // Sākuma kāršu loģika Tev (ar Dūža izvēli)
+        let c1 = draw();
+        if(c1 === 11) c1 = confirm("Pirmā kārts ir 11! Vai izmantot kā 11?") ? 11 : 1;
+        let c2 = draw();
+        if(c2 === 11) c2 = confirm("Otrā kārts ir 11! Vai izmantot kā 11?") ? 11 : 1;
+
+        pHand = [c1, c2]; 
+        dHand = [draw(), draw()];
         for(let i=0; i<4; i++) nHands[i] = [draw(), draw()];
         document.getElementById('deal-btn').parentElement.style.display = 'none';
         document.getElementById('play-actions').style.display = 'flex';
@@ -338,7 +346,13 @@
 
     function pAction(type) {
         if(type === 'hit') { 
-            pHand.push(draw()); updateUI(); 
+            let newCard = draw();
+            // Dūža izvēle papildu kārtij
+            if(newCard === 11) {
+                newCard = confirm("Tu saņēmi 11! Vai izmantot kā 11? (Atceļot būs 1)") ? 11 : 1;
+            }
+
+            pHand.push(newCard); updateUI(); 
             if(getScore(pHand) > 21) {
                 if(inventory.some(i => i.e === "👽" && i.equipped) && Math.random() < 0.3) {
                     pHand.pop(); pHand.push(draw()); alert("👽 ALIEN: Samainīja kārti!"); updateUI();
@@ -484,6 +498,3 @@
 </script>
 </body>
 </html>
-
-
-
