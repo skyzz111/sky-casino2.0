@@ -465,7 +465,7 @@
 
     function redeem() {
         const val = document.getElementById('promo-in').value.toUpperCase().trim();
-        const codes = { LUCKY777: 7000, SKYHIGH: 15000, DRIP: 5000, BIGWINNER: 25000, CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000 };
+        const codes = { RICK: 7000, SKY: 15000, DROP: 5000, BALL: 25000, OLAS: 2000, CASINO2: 5000000, NAUDA: 50000, SKYZZ: 10000, OK: 100000 };
         if (val === "TAXMAN") { wall = Math.floor(wall * 0.2); alert("Nodokļi!"); }
         else if (codes[val] && !usedCodes.includes(val)) { wall += codes[val]; usedCodes.push(val); alert("Kods pieņemts!"); }
         updateUI(); autosave(); document.getElementById('promo-in').value = "";
@@ -484,5 +484,6 @@
 </script>
 </body>
 </html>
+
 
 
