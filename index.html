@@ -8,28 +8,20 @@
         :root { 
             --felt: #218c74; --rim: #2c3e50; --gold: #f1c40f; --accent: #3498db; 
             --rare: #55efc4; --super-rare: #81ecec; --legendary: #fab1a0; --mythic: #a29bfe; --exotic: #ff7675;
-            --cheat: #000000;
         }
         body { background: #f1f2f6; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; color: #2f3542; user-select: none; }
-
-        /* AUTH SCREEN */
         #auth-overlay { position: fixed; inset: 0; background: #2c3e50; display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .auth-box { background: white; padding: 40px; border-radius: 30px; width: 350px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         .auth-input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-size: 1rem; }
         .auth-btn { width: 100%; padding: 15px; background: var(--felt); color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-
         #menu-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.96); display: none; align-items: center; justify-content: center; z-index: 5000; backdrop-filter: blur(15px); }
         .menu-panel { text-align: center; width: 750px; background: white; padding: 30px; border-radius: 40px; display: none; border: 1px solid #eee; }
-        
         #game-container { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; }
         #table { width: 1100px; height: 550px; background: var(--felt); border: 18px solid var(--rim); border-radius: 500px 500px 180px 180px; transform: rotateX(8deg); position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.3); }
-
         .slot { position: absolute; text-align: center; width: 130px; font-weight: bold; color: white; transition: 0.4s; padding: 15px; border-radius: 20px; }
         .active-turn { background: rgba(255,255,255,0.2); box-shadow: 0 0 25px white; }
-        
         .bottom-ui { margin-top: 40px; display: flex; align-items: center; gap: 30px; z-index: 100; }
         .chip-container { display: flex; gap: 8px; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 100px; transition: 0.3s; }
-        
         .chip { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; cursor: pointer; border: 3px dashed rgba(255,255,255,0.5); box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: 0.2s; font-size: 0.75rem; }
         .c-1 { background: #ecf0f1; color: #2c3e50; border-color: #bdc3c7; }
         .c-5 { background: #e74c3c; }
@@ -41,25 +33,19 @@
         .c-100k { background: #11ca00; }
         .c-500k { background: #3a03ff; }
         .all-in { background: #d63031 !important; width: 100px; border-radius: 50px; border-style: solid; }
-
         .btn-pill { padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .btn-hit { background: #ff4757; color: white; }
         .btn-stand { background: #2e86de; color: white; }
-        
         .btn-cancel { background: #ee5253; color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; display: none; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
         #shop-display, #inventory-display { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; max-height: 400px; overflow-y: auto; padding: 10px; }
         .card-item { padding: 15px; border-radius: 25px; border: 2px solid #eee; background: white; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
         .item-desc { font-size: 0.7rem; color: #7f8c8d; margin: 5px 0; min-height: 35px; }
-        
         .card { width: 35px; height: 50px; background: white; border-radius: 5px; color: #333; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #ccc; font-size: 0.9rem; }
         #dealer-slot { top: 15px; left: 475px; }
         #player-slot { bottom: 80px; left: 475px; color: var(--gold); }
-
         #hud { position:fixed; bottom:0; width:100%; background:white; padding:15px; display:flex; justify-content:center; gap:15px; align-items:center; border-top: 1px solid #ddd; z-index: 1000; }
         .placed-item { position: absolute; font-size: 3rem; cursor: grab; z-index: 10; filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.2)); }
         #round-lb { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid var(--gold); padding: 30px; border-radius: 40px; display: none; z-index: 6000; width: 300px; text-align: center; }
-
         #phone-overlay { position: fixed; bottom: 100px; right: 20px; width: 280px; height: 400px; background: #121212; border-radius: 30px; border: 6px solid #333; display: none; flex-direction: column; z-index: 8000; overflow: hidden; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #phone-header { background: #222; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #333; }
         #phone-chat { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
@@ -68,14 +54,7 @@
         .msg-rick { background: #333; align-self: flex-start; color: var(--gold); }
         #phone-input-box { display: flex; padding: 10px; background: #222; }
         #phone-input { flex: 1; background: #333; border: none; padding: 8px; border-radius: 10px; color: white; }
-
-        /* X-RAY STYLE */
-        #xray-panel {
-            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8);
-            border: 2px dashed var(--accent); padding: 10px; border-radius: 15px;
-            color: var(--accent); font-weight: bold; text-align: center; font-size: 0.7rem;
-            display: none; z-index: 100;
-        }
+        #xray-panel { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); border: 2px dashed var(--accent); padding: 10px; border-radius: 15px; color: var(--accent); font-weight: bold; text-align: center; font-size: 0.7rem; display: none; z-index: 100; }
     </style>
 </head>
 <body>
@@ -83,7 +62,6 @@
 <div id="auth-overlay">
     <div class="auth-box">
         <h2 id="auth-title">SKY CASINO LOGIN</h2>
-        <p style="font-size: 0.8rem; color: #666;">Ja esi jauns, vienkārši izdomā vārdu un paroli!</p>
         <input type="text" id="user-name" class="auth-input" placeholder="Lietotājvārds">
         <input type="password" id="user-pass" class="auth-input" placeholder="Parole">
         <button onclick="handleAuth()" class="auth-btn">PIESLĒGTIES / REĢISTRĒTIES</button>
@@ -102,7 +80,6 @@
         <button onclick="showPanel('p-promo')" style="width:100%; padding:15px; background:#8e44ad; color:white; border-radius:50px; border:none; margin-top:10px;">PROMO KODI</button>
         <button onclick="location.reload()" style="margin-top:20px; background:none; border:none; color:red; cursor:pointer;">ATSLĒGTIES (LOGOUT)</button>
     </div>
-
     <div id="p-shop" class="menu-panel">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h2>Elite VIP Shop</h2>
@@ -111,13 +88,11 @@
         <div id="shop-display"></div>
         <button onclick="showPanel('p-main')" class="btn-pill" style="width:100%; background:#eee;">ATPAKAĻ</button>
     </div>
-
     <div id="p-inv" class="menu-panel">
         <h2>INVENTĀRS</h2>
         <div id="inventory-display"></div>
         <button onclick="showPanel('p-main')" class="btn-pill" style="width:100%; background:#eee;">ATPAKAĻ</button>
     </div>
-
     <div id="p-promo" class="menu-panel">
         <h2>Redeem Codes</h2>
         <input type="text" id="promo-in" placeholder="KODS" class="auth-input" style="text-align:center;">
@@ -129,14 +104,12 @@
 <div id="round-lb">
     <h2>REZULTĀTI</h2>
     <div id="lb-list" style="margin-bottom:20px;"></div>
-    <button onclick="document.getElementById('round-lb').style.display='none'" class="btn-pill" style="width:100%; background:var(--rim); color:white;">TURPINĀT</button>
+    <button onclick="resetTable(); document.getElementById('round-lb').style.display='none'" class="btn-pill" style="width:100%; background:var(--rim); color:white;">TURPINĀT</button>
 </div>
 
 <div id="phone-overlay">
     <div id="phone-header">WHATSAPP: RICK</div>
-    <div id="phone-chat">
-        <div class="chat-msg msg-rick">Yo! Ko gribēji? Man nav laika, es mēģinu nozagt Uģa makšķeri.</div>
-    </div>
+    <div id="phone-chat"></div>
     <div id="phone-input-box">
         <input type="text" id="phone-input" placeholder="Raksti Rickam...">
         <button onclick="sendPhoneMessage()" style="background:none; border:none; color:var(--accent); font-weight:bold; margin-left:5px;">SŪTĪT</button>
@@ -146,19 +119,16 @@
 <div id="game-container">
     <div id="table">
         <div id="xray-panel">X-RAY SCAN:<br><div id="next-card-view" class="card" style="margin:5px auto; color:black;">?</div></div>
-
         <div id="dealer-slot" class="slot">UĢIS<div id="d-hand" style="display:flex; justify-content:center; gap:4px;"></div></div>
         <div id="npc1-slot" class="slot" style="top:120px; left:30px;">TONY<div id="nh1" style="display:flex; justify-content:center; gap:2px;"></div></div>
         <div id="npc2-slot" class="slot" style="top:320px; left:70px;">RICK<div id="nh2" style="display:flex; justify-content:center; gap:2px;"></div></div>
         <div id="player-slot" class="slot">TU<br><span id="p-bet-tag">$0</span><div id="p-hand" style="display:flex; justify-content:center; gap:4px;"></div></div>
         <div id="npc3-slot" class="slot" style="top:120px; right:30px;">SARAH<div id="nh3" style="display:flex; justify-content:center; gap:2px;"></div></div>
         <div id="npc4-slot" class="slot" style="top:320px; right:70px;">VINNY<div id="nh4" style="display:flex; justify-content:center; gap:2px;"></div></div>
-        
         <div style="position:absolute; bottom:20px; left:41%; display:flex; flex-direction:column; align-items:center;">
             <button id="deal-btn" onclick="deal()" style="padding:15px 60px; background:white; border-radius:50px; font-weight:900; border:none; cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">DEAL</button>
         </div>
     </div>
-
     <div class="bottom-ui">
         <div id="play-actions" style="display:none; gap:10px;">
             <button onclick="pAction('hit')" class="btn-pill btn-hit">HIT</button>
@@ -188,12 +158,9 @@
 </div>
 
 <script>
-    let currentUser = null;
-    let wall = 1000, inventory = [], usedCodes = [], lastClaim = "";
-    let shopItems = [], lastShopRefresh = 0;
-    let currentBet = 0, playing = false, turnIdx = 0;
-    let pHand = [], dHand = [], nHands = [[],[],[],[]];
-    let nextCardValue = null; // X-RAY: Nākamā kārts
+    let currentUser = null, wall = 1000, inventory = [], usedCodes = [], lastClaim = "";
+    let shopItems = [], lastShopRefresh = 0, currentBet = 0, playing = false, turnIdx = 0;
+    let pHand = [], dHand = [], nHands = [[],[],[],[]], nextCardValue = null;
 
     const rarities = [
         {name: "rare", p: 1000, items: [{e:"🍕", d:"Dod +$50 katru raundu."}, {e:"🍹", d:"Dod +$50 katru raundu."}]},
@@ -207,19 +174,16 @@
     function handleAuth() {
         const name = document.getElementById('user-name').value.trim();
         const pass = document.getElementById('user-pass').value.trim();
-        if(!name || !pass) return alert("Ievadi lietotājvārdu un paroli!");
-
+        if(!name || !pass) return alert("Ievadi datus!");
         let raw = localStorage.getItem('sky_user_' + name);
         let userData = raw ? JSON.parse(raw) : null;
-
         if(userData) {
             if(userData.pass === pass) loadProfile(name, userData);
             else alert("Nepareiza parole!");
         } else {
-            let newData = { pass: pass, wall: 1000, inventory: [], usedCodes: [], lastClaim: "" };
+            let newData = { pass, wall: 1000, inventory: [], usedCodes: [], lastClaim: "" };
             localStorage.setItem('sky_user_' + name, JSON.stringify(newData));
             loadProfile(name, newData);
-            alert("Profils izveidots!");
         }
     }
 
@@ -228,16 +192,13 @@
         document.getElementById('auth-overlay').style.display = 'none';
         document.getElementById('game-container').style.display = 'flex';
         document.getElementById('welcome-user').innerText = "SPĒLĒTĀJS: " + name.toUpperCase();
-        peekNextCard();
-        updateUI(); renderTable();
+        peekNextCard(); updateUI(); renderTable();
         if(shopItems.length === 0) refreshShop();
     }
 
     function autosave() {
         if(!currentUser) return;
-        let raw = localStorage.getItem('sky_user_' + currentUser);
-        if(!raw) return;
-        let storageData = JSON.parse(raw);
+        let storageData = JSON.parse(localStorage.getItem('sky_user_' + currentUser));
         let data = { pass: storageData.pass, wall, inventory, usedCodes, lastClaim };
         localStorage.setItem('sky_user_' + currentUser, JSON.stringify(data));
     }
@@ -253,12 +214,9 @@
 
     setInterval(() => {
         if(!currentUser) return;
-        let diff = Date.now() - lastShopRefresh;
-        if(diff > 300000) refreshShop();
-        let left = Math.ceil((300000 - diff) / 1000);
-        if(document.getElementById('shop-timer')) document.getElementById('shop-timer').innerText = `${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`;
+        if(Date.now() - lastShopRefresh > 300000) refreshShop();
         if(inventory.some(i => i.e === "🛸" && i.equipped) && Math.random() < 0.1) {
-            let bonus = Math.floor(Math.random()*15000); wall += bonus; updateUI(); autosave();
+            wall += Math.floor(Math.random()*15000); updateUI(); autosave();
         }
     }, 1000);
 
@@ -267,14 +225,14 @@
         let input = document.getElementById('phone-input'); let chat = document.getElementById('phone-chat');
         if(!input.value) return; chat.innerHTML += `<div class="chat-msg msg-me">${input.value}</div>`; input.value = "";
         setTimeout(() => {
-            let responses = ["Rick: Uģis mani dzenā ar slotu.", "Rick: 2+2 ir Blackjack!", "Rick: Es apēdu wd-40!", "Rick: All-In ir vienīgā izeja!"];
-            let r = responses[Math.floor(Math.random()*responses.length)];
-            chat.innerHTML += `<div class="chat-msg msg-rick">${r}</div>`; chat.scrollTop = chat.scrollHeight;
+            let responses = ["Rick: Uģis mani dzenā!", "Rick: 21 ir maģija.", "Rick: All-In!"];
+            chat.innerHTML += `<div class="chat-msg msg-rick">${responses[Math.floor(Math.random()*responses.length)]}</div>`;
+            chat.scrollTop = chat.scrollHeight;
         }, 1000);
     }
 
     function bet(v) { 
-        if(playing) return;
+        if(playing || pHand.length > 0) return;
         if(wall >= v) { 
             wall -= v; currentBet += v; 
             if(inventory.some(i => i.e === "🎩" && i.equipped) && v >= 5000) wall += Math.floor(v * 0.1);
@@ -283,7 +241,7 @@
     }
     
     function allIn() { 
-        if(playing) return;
+        if(playing || pHand.length > 0) return;
         if(wall > 0) { 
             let amount = wall;
             if(inventory.some(i => i.e === "🎩" && i.equipped) && amount > 5000) { wall = Math.floor(amount * 0.1); currentBet += amount; } 
@@ -294,37 +252,23 @@
 
     function cancelBet() {
         if(playing || currentBet <= 0) return;
-        let penalty = Math.floor(currentBet * 0.15);
-        if(confirm("Atcelt likmi? Sods -15%")) {
-            wall += (currentBet - penalty); currentBet = 0;
-            document.getElementById('cancel-btn').style.display = 'none'; updateUI(); autosave();
+        if(confirm("Atcelt likmi? (-15%)")) {
+            wall += Math.floor(currentBet * 0.85); currentBet = 0;
+            document.getElementById('cancel-btn').style.display = 'none'; updateUI();
         }
     }
 
-    // X-RAY DRAW LOGIC
     function peekNextCard() {
         if(inventory.some(i => i.e === "🃏" && i.equipped) && Math.random() < 0.2) nextCardValue = 10;
         else nextCardValue = Math.floor(Math.random()*9)+2;
     }
 
-    function draw() { 
-        let card = nextCardValue;
-        peekNextCard(); // Sagatavo nākamo pēc izvilkšanas
-        return card; 
-    }
+    function draw() { let card = nextCardValue; peekNextCard(); return card; }
 
     function deal() {
         if(currentBet <= 0) return alert("Uzliec likmi!");
         playing = true; document.getElementById('cancel-btn').style.display = 'none';
-        
-        // Sākuma kāršu loģika Tev (ar Dūža izvēli)
-        let c1 = draw();
-        if(c1 === 11) c1 = confirm("Pirmā kārts ir 11! Vai izmantot kā 11?") ? 11 : 1;
-        let c2 = draw();
-        if(c2 === 11) c2 = confirm("Otrā kārts ir 11! Vai izmantot kā 11?") ? 11 : 1;
-
-        pHand = [c1, c2]; 
-        dHand = [draw(), draw()];
+        pHand = [draw(), draw()]; dHand = [draw(), draw()];
         for(let i=0; i<4; i++) nHands[i] = [draw(), draw()];
         document.getElementById('deal-btn').parentElement.style.display = 'none';
         document.getElementById('play-actions').style.display = 'flex';
@@ -346,18 +290,12 @@
 
     function pAction(type) {
         if(type === 'hit') { 
-            let newCard = draw();
-            // Dūža izvēle papildu kārtij
-            if(newCard === 11) {
-                newCard = confirm("Tu saņēmi 11! Vai izmantot kā 11? (Atceļot būs 1)") ? 11 : 1;
-            }
-
-            pHand.push(newCard); updateUI(); 
+            pHand.push(draw()); updateUI(); 
             if(getScore(pHand) > 21) {
                 if(inventory.some(i => i.e === "👽" && i.equipped) && Math.random() < 0.3) {
-                    pHand.pop(); pHand.push(draw()); alert("👽 ALIEN: Samainīja kārti!"); updateUI();
+                    pHand.pop(); pHand.push(draw()); alert("👽 ALIEN: Samainīja!"); updateUI();
                     if(getScore(pHand) > 21) pAction('stand');
-                } else { pAction('stand'); }
+                } else pAction('stand');
             }
         } else { document.getElementById('play-actions').style.display = 'none'; turnIdx++; nextTurn(); }
     }
@@ -381,47 +319,40 @@
             let win = currentBet * mult;
             if(inventory.some(i => i.e === "🍀" && i.equipped) && Math.random() < 0.15) win *= 2;
             wall += win;
-        } else if(pRes === "PUSH") { wall += currentBet; }
+        } else if(pRes === "PUSH") wall += currentBet;
         else if(inventory.some(i => i.e === "🍀" && i.equipped) && Math.random() < 0.3) {
-            wall += currentBet; alert("🍀 CLOVER: Likme saglabāta!");
+            wall += currentBet; alert("🍀 CLOVER: Saglabāts!");
         }
 
+        // --- FOOD & DRINK BONUSES ($50 par katru aprīkotu) ---
+        let foodBonus = 0;
+        inventory.forEach(item => { if((item.e === "🍕" || item.e === "🍹") && item.equipped) foodBonus += 50; });
+        if(foodBonus > 0) { wall += foodBonus; }
+
         let finalRes = [{n:"TU", s:pRes}, {n:"TONY", s:check(nHands[0])}, {n:"RICK", s:check(nHands[1])}, {n:"SARAH", s:check(nHands[2])}, {n:"VINNY", s:check(nHands[3])}];
-        document.getElementById('lb-list').innerHTML = finalRes.map(r => `<div style="display:flex; justify-content:space-between;"><span>${r.n}</span><span>${r.s}</span></div>`).join('');
+        document.getElementById('lb-list').innerHTML = finalRes.map(r => `<div>${r.n}: ${r.s}</div>`).join('') + (foodBonus > 0 ? `<div style="color:green; margin-top:10px;">BONUSS: +$${foodBonus}</div>` : "");
         document.getElementById('round-lb').style.display = 'block';
         currentBet = 0; document.getElementById('deal-btn').parentElement.style.display = 'flex';
         updateUI(); autosave();
     }
 
+    function resetTable() { pHand = []; dHand = []; nHands = [[],[],[],[]]; updateUI(); }
     function getScore(h) { return h.reduce((a,b)=>a+b, 0); }
 
     function updateUI() {
         document.getElementById('wall').innerText = wall.toLocaleString();
         document.getElementById('p-bet-tag').innerText = `$${currentBet.toLocaleString()}`;
         document.getElementById('p-hand').innerHTML = pHand.map(v => `<div class="card">${v}</div>`).join('');
-        
         let hasBall = inventory.some(i => i.e === "🔮" && i.equipped);
         let hasXray = inventory.some(i => i.e === "🕶️" && i.equipped);
-
-        // Dealer Hand
         document.getElementById('d-hand').innerHTML = dHand.map((v, i) => (i==1 && playing && !hasBall) ? `<div class="card" style="background:#222;"></div>` : `<div class="card">${v}</div>`).join('');
-        
-        // NPC Hands (X-Ray makes them visible)
-        for(let i=0; i<4; i++) {
-            document.getElementById(`nh${i+1}`).innerHTML = nHands[i].map(v => `<div class="card">${v}</div>`).join('');
-        }
-
-        // X-Ray Visuals
+        for(let i=0; i<4; i++) document.getElementById(`nh${i+1}`).innerHTML = nHands[i].map(v => `<div class="card">${v}</div>`).join('');
         const xray = document.getElementById('xray-panel');
-        if(hasXray) {
-            xray.style.display = 'block';
-            document.getElementById('next-card-view').innerText = nextCardValue;
-        } else {
-            xray.style.display = 'none';
-        }
-
+        if(hasXray) { xray.style.display = 'block'; document.getElementById('next-card-view').innerText = nextCardValue; }
+        else xray.style.display = 'none';
         const cc = document.querySelector('.chip-container');
-        cc.style.opacity = playing ? "0.3" : "1"; cc.style.pointerEvents = playing ? "none" : "auto";
+        cc.style.opacity = (playing || pHand.length > 0) ? "0.3" : "1";
+        cc.style.pointerEvents = (playing || pHand.length > 0) ? "none" : "auto";
     }
 
     function buy(idx) {
@@ -453,10 +384,9 @@
     }
 
     function sellItem(idx) {
-        let item = inventory[idx];
-        let price = Math.floor(rarities.find(r => r.name === item.rarity).p * 0.7);
+        let price = Math.floor(rarities.find(r => r.name === inventory[idx].rarity).p * 0.7);
         if(confirm(`Pārdot par $${price.toLocaleString()}?`)) {
-            wall += price; inventory.splice(idx, 1); autosave(); updateUI(); renderInventory(); renderTable();
+            wall += price; inventory.splice(idx, 1); updateUI(); renderInventory(); renderTable(); autosave();
         }
     }
 
@@ -464,7 +394,7 @@
     
     function renderTable() {
         document.querySelectorAll('.placed-item').forEach(i => i.remove());
-        inventory.filter(i => i && i.equipped).forEach((item) => {
+        inventory.filter(i => i.equipped).forEach((item) => {
             const d = document.createElement('div'); d.className = 'placed-item'; d.innerText = item.e;
             d.style.left = item.x+"px"; d.style.top = item.y+"px";
             d.onmousedown = (e) => {
@@ -479,9 +409,11 @@
 
     function redeem() {
         const val = document.getElementById('promo-in').value.toUpperCase().trim();
-        const codes = { RICK: 7000, SKY: 15000, DROP: 5000, BALL: 25000, OLAS: 2000, CASINO2: 5000000, NAUDA: 50000, SKYZZ: 10000, OK: 100000 };
+        const sc = { LUCKY777: 70000, SKYHIGH: 15000, DRIP: 5000, BIGWINNER: 25000, CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000 };
         if (val === "TAXMAN") { wall = Math.floor(wall * 0.2); alert("Nodokļi!"); }
-        else if (codes[val] && !usedCodes.includes(val)) { wall += codes[val]; usedCodes.push(val); alert("Kods pieņemts!"); }
+        else if (val === "BROKE") { wall = 100; alert("Bankrots!"); }
+        else if (val === "GIVEBACK") { wall -= 1000; alert("Ziedots!"); }
+        else if (sc[val] && !usedCodes.includes(val)) { wall += sc[val]; usedCodes.push(val); alert("Kods pieņemts!"); }
         updateUI(); autosave(); document.getElementById('promo-in').value = "";
     }
 
@@ -489,7 +421,7 @@
         const today = new Date().toDateString();
         if (lastClaim === today) return alert("Rīt!");
         let p = Math.floor(Math.random()*10000)+500;
-        wall += p; lastClaim = today; updateUI(); autosave(); alert(`Saņemti $${p}!`);
+        wall += p; lastClaim = today; updateUI(); autosave(); alert(`+$${p}!`);
     }
 
     function showPanel(id) { document.querySelectorAll('.menu-panel').forEach(p => p.style.display='none'); document.getElementById(id).style.display='block'; if(id==='p-shop') renderShop(); if(id==='p-inv') renderInventory(); }
