@@ -7,7 +7,7 @@
     <style>
         :root { 
             --felt: #218c74; --rim: #2c3e50; --gold: #f1c40f; --accent: #3498db; 
-            --rare: #55efc4; --super-rare: #81ecec; --legendary: #fab1a0; --mythic: #a29bfe; --exotic: #ff7675;
+            --rare: #55efc4; --super-rare: #81ecec; --legendary: #fab1a0; --mythic: #a29bfe; --exotic: #ff7675; --cheat: #000;
         }
         body { background: #f1f2f6; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; color: #2f3542; user-select: none; }
         #auth-overlay { position: fixed; inset: 0; background: #2c3e50; display: flex; align-items: center; justify-content: center; z-index: 9999; }
@@ -210,15 +210,25 @@
             let itemData = r.items[Math.floor(Math.random()*r.items.length)];
             shopItems.push({e: itemData.e, d: itemData.d, rarity: r.name, p: r.p});
         }
+        if(document.getElementById('p-shop').style.display === 'block') renderShop();
     }
 
     setInterval(() => {
         if(!currentUser) return;
+        updateShopTimer();
         if(Date.now() - lastShopRefresh > 300000) refreshShop();
         if(inventory.some(i => i.e === "🛸" && i.equipped) && Math.random() < 0.1) {
             wall += Math.floor(Math.random()*15000); updateUI(); autosave();
         }
     }, 1000);
+
+    function updateShopTimer() {
+        let elapsed = Date.now() - lastShopRefresh;
+        let remaining = Math.max(0, 300000 - elapsed);
+        let mins = Math.floor(remaining / 60000);
+        let secs = Math.floor((remaining % 60000) / 1000);
+        document.getElementById('shop-timer').innerText = (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
+    }
 
     function togglePhone() { let p = document.getElementById('phone-overlay'); p.style.display = (p.style.display === 'flex') ? 'none' : 'flex'; }
     function sendPhoneMessage() {
@@ -324,10 +334,9 @@
             wall += currentBet; alert("🍀 CLOVER: Saglabāts!");
         }
 
-        // --- FOOD & DRINK BONUSES ($50 par katru aprīkotu) ---
         let foodBonus = 0;
         inventory.forEach(item => { if((item.e === "🍕" || item.e === "🍹") && item.equipped) foodBonus += 50; });
-        if(foodBonus > 0) { wall += foodBonus; }
+        if(foodBonus > 0) wall += foodBonus;
 
         let finalRes = [{n:"TU", s:pRes}, {n:"TONY", s:check(nHands[0])}, {n:"RICK", s:check(nHands[1])}, {n:"SARAH", s:check(nHands[2])}, {n:"VINNY", s:check(nHands[3])}];
         document.getElementById('lb-list').innerHTML = finalRes.map(r => `<div>${r.n}: ${r.s}</div>`).join('') + (foodBonus > 0 ? `<div style="color:green; margin-top:10px;">BONUSS: +$${foodBonus}</div>` : "");
@@ -374,7 +383,7 @@
 
     function renderInventory() {
         document.getElementById('inventory-display').innerHTML = inventory.map((item, idx) => `
-            <div class="card-item">
+            <div class="card-item" style="border-top: 5px solid var(--${item.rarity})">
                 <span style="font-size:2.5rem">${item.e}</span>
                 <div style="display:flex; gap:5px; width:100%; margin-top:10px;">
                     <button onclick="toggleEquip(${idx})" class="btn-pill" style="background:${item.equipped?'#7f8c8d':'var(--accent)'}; color:white; flex:1; font-size:0.6rem;">${item.equipped?'OFF':'ON'}</button>
@@ -384,9 +393,17 @@
     }
 
     function sellItem(idx) {
-        let price = Math.floor(rarities.find(r => r.name === inventory[idx].rarity).p * 0.7);
-        if(confirm(`Pārdot par $${price.toLocaleString()}?`)) {
-            wall += price; inventory.splice(idx, 1); updateUI(); renderInventory(); renderTable(); autosave();
+        let item = inventory[idx];
+        let rarityData = rarities.find(r => r.name === item.rarity);
+        let price = rarityData ? Math.floor(rarityData.p * 0.7) : 500;
+
+        if(confirm(`Pārdot ${item.e} par $${price.toLocaleString()}?`)) {
+            wall += price;
+            inventory.splice(idx, 1);
+            updateUI();
+            renderInventory();
+            renderTable();
+            autosave();
         }
     }
 
@@ -409,11 +426,14 @@
 
     function redeem() {
         const val = document.getElementById('promo-in').value.toUpperCase().trim();
-        const sc = { LUCKY777: 70000, SKYHIGH: 15000, DRIP: 5000, BIGWINNER: 25000, CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000 };
-        if (val === "TAXMAN") { wall = Math.floor(wall * 0.2); alert("Nodokļi!"); }
-        else if (val === "BROKE") { wall = 100; alert("Bankrots!"); }
-        else if (val === "GIVEBACK") { wall -= 1000; alert("Ziedots!"); }
-        else if (sc[val] && !usedCodes.includes(val)) { wall += sc[val]; usedCodes.push(val); alert("Kods pieņemts!"); }
+        const codes = { LUCKY777: 7000, SKYHIGH: 15000, DRIP: 5000, BIGWINNER: 25000, CHIPS: 2000, JACKPOT: 50000, CASINO2026: 10000, RICH: 100000 };
+        if (val === "TAXMAN") { wall = Math.floor(wall * 0.2); alert("TAXMAN: Valsts paņēma 80%!"); }
+        else if (val === "BROKE") { wall = 100; alert("BROKE: Tavs konts tagad ir $100!"); }
+        else if (val === "GIVEBACK") { wall -= 1000; alert("GIVEBACK: Paldies par ziedojumu labdarībai (-$1000)!"); }
+        else if (codes[val]) {
+            if(!usedCodes.includes(val)) { wall += codes[val]; usedCodes.push(val); alert(`KODS PIEŅEMTS! Saņemts +$${codes[val].toLocaleString()}`); }
+            else alert("Kods jau ir izmantots!");
+        } else alert("Nepareizs kods!");
         updateUI(); autosave(); document.getElementById('promo-in').value = "";
     }
 
